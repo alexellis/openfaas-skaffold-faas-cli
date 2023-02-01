@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quick-warmup
+  namespace: openfaas-fn
+  labels:
+    app: quick
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: quick
+  template:
+    metadata:
+      labels:
+        app: quick
+    spec:
+      containers:
+      - name: quick
+        image: alexellis2/quick
+        command: ["fwatchdog", "--version"]
+        ports:
+        - containerPort: 8080

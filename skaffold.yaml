@@ -1,0 +1,24 @@
+apiVersion: skaffold/v4beta2
+kind: Config
+metadata:
+  name: quick
+build:
+  tagPolicy:
+    inputDigest: {}
+  artifacts:
+  - image: alexellis2/quick
+    custom:
+      buildCommand: |
+        sed 's/SKAFFOLD_IMAGE/IMAGE/g' ./stack.yml > /tmp/stack.yml
+        DOCKER_BUILDKIT=1 faas-cli publish -f /tmp/stack.yml
+      dependencies:
+        paths:
+          - ./quick/**/
+    hooks:
+      before:
+        - command: ["kubectl", "delete", "job", "quick", "--ignore-not-found=true"]
+      after:
+        - command: ["faas-cli", "deploy"]
+manifests:
+  rawYaml:
+  - ./warmup.yaml
